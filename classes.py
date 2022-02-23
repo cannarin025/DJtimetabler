@@ -15,7 +15,7 @@ class Tutor:
             for t, names in zip(self.requested_schedule.keys(), self.requested_schedule.values()):
                 for name in names:
                     for student in student_list:
-                        if name.upper() in student.name.upper().split(' '):
+                        if name.upper() == student.name.upper():
                             self.schedule[t].append(student)
                             student.movable = False
             
