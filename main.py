@@ -3,12 +3,13 @@ from typing import List, Tuple, Union
 from classes import Tutor, Student, Slot
 
 tutors: List[Tutor] = [
-    Tutor("Zhengli", genres=["Commercial"], available_times=["19-22"], requested_schedule={19: ['claudia', 'matija', 'steph']}),
-    Tutor("Can", genres=["EDM", "Commercial"], available_times=["19-22"], requested_schedule={20: ['patrick', 'konrad', 'priam']}),
+    Tutor("Zhengli", genres=["Commercial"], available_times=["19-22"]),
+    Tutor("Can", genres=["EDM", "Commercial"], available_times=["19-22"]),
     Tutor("Suley", genres=["Underground"], available_times=['19-22']),
     Tutor("Nico", genres=["Underground"], available_times=['19-22']),
     #Tutor("Chris", genres=["Underground"], available_times=["19-21"])
     #Tutor("Nico", genres=["Underground"], available_times=['19-21'])
+    # example: Tutor("Can", genres=["EDM", "Commercial"], available_times=["19-22"], requested_schedule={20: ['patrick', 'konrad', 'priam']}
 ]
 
 students: List[Student] = []
@@ -108,8 +109,8 @@ def get_best_slots(student) -> List[Slot]:
                     priority6.append(Slot(tutor,time))
     return priority1+priority2+priority3+priority4+priority5+priority6
 
-def attempt_assignment(student: Student):
-    """A function that attempts to assign a student to the first available tutor in a list"""
+def attempt_assignment(student: Student) -> bool:
+    """A function that attempts to assign a student to a list of slots in order of suitability and recursively deals with clashes"""
     global prev_clashes
     slots = get_best_slots(student)
     for slot in get_best_slots(student):
@@ -128,7 +129,7 @@ def attempt_assignment(student: Student):
 
     return False  # no matching time between the student and any suitable tutors could be found
 
-def get_all_assigned():
+def get_all_assigned() -> List[Student]:
     assigned = []
     for t in tutors:
         for students in t.schedule.values():
