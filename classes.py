@@ -50,9 +50,12 @@ class DJtimetabler:
         for tutor in self.tutors:
             outstr += f"{tutor.name}'s schedule:\n"
             for time in tutor.schedule.keys():
-                outstr += f"Time: {time}: {[s.name for s in tutor.schedule[time]]}\n"
-
-        outstr += f"Not assigned: {[s.name for s in self.not_assigned]}\n"
+                names = ', '.join([s.name for s in tutor.schedule[time]])
+                outstr += f"Time: {time}: {names}\n"
+            outstr += '\n'
+            
+        names = ' '.join([s.name for s in self.not_assigned])
+        outstr += f"\nNot assigned: {names}\n"
         return outstr
 
     def assign_tutor(self, time: str, tutor: Tutor, student: Student):
