@@ -164,7 +164,6 @@ class DJtimetabler:
         return assigned
 
     def make_timetable(self):
-        not_assigned = []
         # Initial assignment
         [t.assign_requested_timetable(self.students) for t in self.tutors]
         pre_assigned = self.get_all_assigned()
@@ -172,4 +171,4 @@ class DJtimetabler:
             if student not in pre_assigned:
                 assigned = self.attempt_assignment(student)
                 if not assigned:
-                    not_assigned.append(student)
+                    self.not_assigned.append(student)
