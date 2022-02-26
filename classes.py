@@ -43,6 +43,17 @@ class DJtimetabler:
         self.tutors = tutors
         self.max_students = max_students
         self.schedule = {t: {} for t in self.tutors}
+        self.make_timetable()
+    
+    def __repr__(self) -> str:
+        outstr = ''
+        for tutor in self.tutors:
+            outstr += f"{tutor.name}'s schedule:\n"
+            for time in tutor.schedule.keys():
+                outstr += f"Time: {time}: {[s.name for s in tutor.schedule[time]]}\n"
+
+        outstr += f"Not assigned: {[s.name for s in self.not_assigned]}\n"
+        return outstr
 
     def assign_tutor(self, time: str, tutor: Tutor, student: Student):
         if time in tutor.schedule.keys() and len(tutor.schedule[time]) < self.max_students:
@@ -133,15 +144,14 @@ class DJtimetabler:
             if self.assign_tutor(slot.time, slot.tutor, student):
                 return True  # student has been booked onto session with tutor
             elif len(slot.tutor.schedule[slot.time]) >= self.max_students and student not in slot.tutor.schedule[slot.time] and student not in self.prev_clashes: # tutor available but full at this time, attempt to move previous student to make space
-                    clashes = slot.tutor.schedule[slot.time]
-                    for clash in clashes:
-                        if clash.movable:
-                            self.prev_clashes.append(clash)
-                            clash_resolved = self.attempt_assignment(clash)
-                            if clash_resolved:
-                                prev_clashes = []
-                                slot.tutor.schedule[slot.time].remove(clash)
-                                return self.assign_tutor(slot.time, slot.tutor, student)
+                clashes = slot.tutor.schedule[slot.time]
+                for clash in clashes:
+                    if clash.movable:
+                        self.prev_clashes.append(clash)
+                        if clash_resolved := self.attempt_assignment(clash):
+                            prev_clashes = []
+                            slot.tutor.schedule[slot.time].remove(clash)
+                            return self.assign_tutor(slot.time, slot.tutor, student)
 
         return False  # no matching time between the student and any suitable tutors could be found
 
@@ -163,11 +173,3 @@ class DJtimetabler:
                 assigned = self.attempt_assignment(student)
                 if not assigned:
                     not_assigned.append(student)
-    
-    def show_timetable(self):
-        for tutor in self.tutors:
-            print(f"{tutor.name}'s schedule:")
-            for time in tutor.schedule.keys():
-                print(f"Time: {time}: {[s.name for s in tutor.schedule[time]]}")
-
-        print(f"Not assigned: {[s.name for s in self.not_assigned]}")

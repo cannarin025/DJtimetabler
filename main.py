@@ -22,6 +22,5 @@ for index, row in df.iterrows():
     skill_level = row["Experience level"].split(' ')[0]
     students.append(Student(name, pref_tutors, available_times, pref_genres, skill_level))
 
-timetabler = DJtimetabler(students, tutors, 3)
-timetabler.make_timetable()
-timetabler.show_timetable()
+timetable = DJtimetabler(students, tutors, 3)
+print(timetable)
