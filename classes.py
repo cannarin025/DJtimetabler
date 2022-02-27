@@ -99,7 +99,10 @@ class DJtimetabler:
         student_times = self.get_available_times(student)
         pref_tutors = self.get_preferred_tutors(student)
         suitable_tutors = self.get_suitable_tutors(student)
-        tutor_list = pref_tutors or suitable_tutors
+        tutor_list = []
+        for tutor in pref_tutors + suitable_tutors:
+            if tutor not in tutor_list:
+                tutor_list.append(tutor)
         priority1, priority2, priority3, priority4, priority5, priority6 = ([],[],[],[],[],[])
         for tutor in tutor_list:
             for time in self.get_available_times(tutor):
