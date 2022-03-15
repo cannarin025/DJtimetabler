@@ -5,18 +5,20 @@ from classes import DJtimetabler, Tutor, Student, Slot
 tutors: List[Tutor] = [
     Tutor("Zhengli", genres=["Commercial"], available_times=["19-22"]),
     Tutor("Can", genres=["EDM", "Commercial"], available_times=["19-22"]),
-    Tutor("Suley", genres=["Underground"], available_times=['19-22']),
-    Tutor("Nico", genres=["Underground"], available_times=['19-22']),
+    Tutor("Nico", genres=["Underground"], available_times=['19-21']),
+    Tutor("Joao", genres=["Commerical", "Underground"], available_times=['19-22']),
     #Tutor("Chris", genres=["Underground"], available_times=["19-21"])
     #Tutor("Nico", genres=["Underground"], available_times=['19-21'])
     # example: Tutor("Can", genres=["EDM", "Commercial"], available_times=["19-22"], requested_schedule={20: ['patrick', 'konrad', 'priam']}
 ]
 
 students: List[Student] = []
-df = pd.read_csv('./responses.csv')
+df = pd.read_csv('./responses2.csv')
 for index, row in df.iterrows():
     name = row['Full name'].strip()
-    pref_tutors = list(filter(lambda t: t.name in [row['Preferred tutor'].strip()], tutors))
+    pref_tutors = list(filter(lambda t: t.name in [row['Preferred tutor [Preference 1]'].strip(), 
+                                                   row['Preferred tutor [Preference 2]'].strip(), 
+                                                   row['Preferred tutor [Preference 3]'].strip()],tutors))
     available_times = [(int(x.split(':')[0]) for x in time.split('-')) for time in row["Available times"].split(",")]
     pref_genres = [row["Preferred genres"].split(" ")[0].strip()]
     skill_level = row["Experience level"].split(' ')[0]

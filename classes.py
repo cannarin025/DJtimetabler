@@ -28,11 +28,13 @@ class Student:
         self.genres = genres
         self.skill_level = skill_level
         self.movable = True
+        self.assigned_pref_tutor = False
 
 @dataclass
 class Slot:
     tutor: Tutor
     time: int
+
 
 class DJtimetabler:
     not_assigned = []
@@ -53,7 +55,7 @@ class DJtimetabler:
                 names = ', '.join([s.name for s in tutor.schedule[time]])
                 outstr += f"Time: {time}: {names}\n"
             outstr += '\n'
-
+            
         names = ' '.join([s.name for s in self.not_assigned])
         outstr += f"\nNot assigned: {names}\n"
         return outstr
@@ -61,6 +63,8 @@ class DJtimetabler:
     def assign_tutor(self, time: str, tutor: Tutor, student: Student):
         if time in tutor.schedule.keys() and len(tutor.schedule[time]) < self.max_students:
             tutor.schedule[time].append(student)
+            if tutor in student.pref_tutors:
+                student.assigned_pref_tutor = True
             return True
         else:
             return False
@@ -103,43 +107,42 @@ class DJtimetabler:
         for tutor in pref_tutors + suitable_tutors:
             if tutor not in tutor_list:
                 tutor_list.append(tutor)
-        priority1, priority2, priority3 = ([],[],[])
+        priority1, priority2, priority3, priority4, priority5, priority6 = ([],[],[],[],[],[])
         for tutor in tutor_list:
             for time in self.get_available_times(tutor):
                 if time in student_times:
-                    if pref_tutors:
-                        # all students in session with preferred tutor are of same skill level
-                        if all(
-                            current_student.skill_level in student.skill_level
-                            for current_student in tutor.schedule[time]
-                        ) and tutor in student.pref_tutors:
-                            priority1.append(Slot(tutor, time))
-                        # some students in session with preferred tutor are of same skill level
-                        elif any(
-                            current_student.skill_level in student.skill_level
-                            for current_student in tutor.schedule[time]
-                        ) and tutor in student.pref_tutors:
-                            priority2.append(Slot(tutor, time))
-                        # tutor is preferred tutor
-                        elif tutor in student.pref_tutors:
-                            priority3.append(Slot(tutor, time))
-                    elif suitable_tutors and not priority1+priority2+priority3:
+                    # all students in session with preferred tutor are of same skill level
+                    if all(
+                        current_student.skill_level in student.skill_level
+                        for current_student in tutor.schedule[time]
+                    ) and tutor in student.pref_tutors:
+                        priority1.append(Slot(tutor, time))
+                    # some students in session with preferred tutor are of same skill level
+                    elif any(
+                        current_student.skill_level in student.skill_level
+                        for current_student in tutor.schedule[time]
+                    ) and tutor in student.pref_tutors:
+                        priority2.append(Slot(tutor, time))
+                    # tutor is preferred tutor
+                    elif tutor in student.pref_tutors:
+                        priority3.append(Slot(tutor, time))
+                    elif not student.assigned_pref_tutor:
                         # all students in session with suitable tutor are of same skill level
                         if all(
                             current_student.skill_level in student.skill_level
                             for current_student in tutor.schedule[time]
                         ):
-                            priority1.append(Slot(tutor, time))
+                            priority4.append(Slot(tutor, time))
                         # some students in session with suitable tutor are of same skill level
-                        elif any(
+                        if any(
                             current_student.skill_level in student.skill_level
                             for current_student in tutor.schedule[time]
                         ):
-                            priority2.append(Slot(tutor, time))
+                            priority5.append(Slot(tutor, time))
                         # no students in session with suitable tutor are of same skill level
                         else:
-                            priority3.append(Slot(tutor,time))
-        return priority1+priority2+priority3
+                            priority6.append(Slot(tutor,time))
+        return priority1+priority2+priority3+priority4+priority5+priority6
 
     def attempt_assignment(self, student: Student) -> bool:
         """A function that attempts to assign a student to a list of slots in order of suitability and recursively deals with clashes"""
@@ -177,3 +180,4 @@ class DJtimetabler:
                 assigned = self.attempt_assignment(student)
                 if not assigned:
                     self.not_assigned.append(student)
+
