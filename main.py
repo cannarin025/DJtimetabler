@@ -13,12 +13,11 @@ tutors: List[Tutor] = [
 ]
 
 students: List[Student] = []
-df = pd.read_csv('./responses2.csv')
+df = pd.read_csv('./responses.csv')
 for index, row in df.iterrows():
     name = row['Full name'].strip()
-    pref_tutors = list(filter(lambda t: t.name in [row['Preferred tutor [Preference 1]'].strip(), 
-                                                   row['Preferred tutor [Preference 2]'].strip(), 
-                                                   row['Preferred tutor [Preference 3]'].strip()],tutors))
+    pref_tutors = list(filter(lambda t: t.name in [str(row[f'Preferred tutor [Preference {i}]']).strip() for i in range(1,4)], tutors))
+    
     available_times = [(int(x.split(':')[0]) for x in time.split('-')) for time in row["Available times"].split(",")]
     pref_genres = [row["Preferred genres"].split(" ")[0].strip()]
     skill_level = row["Experience level"].split(' ')[0]
